@@ -109,15 +109,60 @@ def update_page_property(page_data,pageId,headers,property_name, property_type, 
     print("Content Board updated!")
 
 
-def check_task(task_page_data, task_page_id, headers, check_status=True):
-    updateURL = f'https://api.notion.com/v1/pages/{task_page_id}'
-    task_page_data["properties"]["Check"]["checkbox"]=check_status
-    task_name = task_page_data["properties"]["Task"]["title"][0]["plain_text"]
-    updated_task_page = json.dumps(task_page_data)
-    res = requests.request("PATCH", updateURL, headers=headers, data=updated_task_page)
-    #print(res.text)
-    print(f"Task: {task_name} ✅")
+# def check_task(task_page_data, task_page_id, headers, check_status=True):
+#     updateURL = f'https://api.notion.com/v1/pages/{task_page_id}'
+#     task_page_data["properties"]["Checkbox"]["checkbox"]=check_status
+#     task_name = task_page_data["properties"]["Name"]["title"][0]["plain_text"]
+#     updated_task_page = json.dumps(task_page_data)
+#     res = requests.request("PATCH", updateURL, headers=headers, data=updated_task_page)
+#     #print(res.text)
+#     print(f"Task: {task_name} ✅")
 
+def check_task(task_page_data, task_page_id, headers, check_status=True):
+    """
+    Updates the checkbox status of a task.
+    
+    Args:
+        task_page_data: The full task page data
+        task_page_id: ID of the task page
+        headers: API headers for authentication
+        check_status: Boolean to set checkbox status (True = checked)
+    """
+    updateURL = f'https://api.notion.com/v1/pages/{task_page_id}'
+    
+    # Create a clean properties object with only the properties we want to update
+    updated_properties = {}
+    
+    # Only update the checkbox property
+    if "Checkbox" in task_page_data["properties"]:
+        updated_properties["Checkbox"] = {
+            "checkbox": check_status
+        }
+    
+    # Build a clean payload with just what we need
+    update_data = {
+        "properties": updated_properties
+    }
+    
+    # Get the task name for our message
+    task_name = "Unknown task"
+    if "Name" in task_page_data["properties"] and task_page_data["properties"]["Name"]["title"]:
+        task_name = task_page_data["properties"]["Name"]["title"][0]["plain_text"]
+    
+    # Convert to JSON
+    updated_task_page = json.dumps(update_data)
+    
+    # Make the API request
+    res = requests.request("PATCH", updateURL, headers=headers, data=updated_task_page)
+    
+    # Print the response for debugging
+    print(res.status_code)
+    
+    if res.status_code == 200:
+        print(f"Task: {task_name} ✅")
+    else:
+        print(f"Failed to update task: {task_name}")
+        print(f"Error: {res.text}")
 
 def create_task(task_title, tasks_databaseId, headers):
     update_DB_URL = f'https://api.notion.com/v1/databases/{tasks_databaseId}'
