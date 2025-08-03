@@ -40,87 +40,49 @@ def get_tasks_from_db(db_data):
             task_name = db_data["results"][i]["properties"]["Name"]["title"][0]["plain_text"]
             print(f"{i} - {task_name}")
 
-# def check_task(task_page_data, task_page_id, headers, check_status=True):
-#     updateURL = f'https://api.notion.com/v1/pages/{task_page_id}'
-    
-#     # Create a clean properties object with only the properties we want to update
-#     updated_properties = {}
-    
-#     # Only update the checkbox property
-#     if "Checkbox" in task_page_data["properties"]:
-#         updated_properties["Checkbox"] = {
-#             "checkbox": check_status
-#         }
-    
-#     # Build a clean payload with just what we need
-#     update_data = {
-#         "properties": updated_properties
-#     }
-    
-#     # Get the task name for our message
-#     task_name = "Unknown task"
-#     if "Name" in task_page_data["properties"] and task_page_data["properties"]["Name"]["title"]:
-#         task_name = task_page_data["properties"]["Name"]["title"][0]["plain_text"]
-    
-#     # Convert to JSON
-#     updated_task_page = json.dumps(update_data)
-    
-#     # Make the API request
-#     res = requests.request("PATCH", updateURL, headers=headers, data=updated_task_page)
-    
-#     # Print the response for debugging
-#     print(res.status_code)
-#     print(res.text)
-    
-#     if res.status_code == 200:
-#         print(f"Task: {task_name} ✅")
-#     else:
-#         print(f"Failed to update task: {task_name}")
-#         print(f"Error: {res.text}")
+def create_task(task_title, tasks_databaseId, headers):
+    update_PAGE_URL = "https://api.notion.com/v1/pages"
 
-# def create_task(task_title, tasks_databaseId, headers):
-#     update_PAGE_URL = "https://api.notion.com/v1/pages"
+    # Define the properties of the new page
+    properties = {
+        "Name": {
+            "title": [
+                {
+                    "text": {
+                        "content": task_title
+                    }
+                }
+            ]
+        },
+        "Checkbox": {
+            "checkbox": False
+        }
+    }
 
-#     # Define the properties of the new page
-#     properties = {
-#         "Name": {
-#             "title": [
-#                 {
-#                     "text": {
-#                         "content": task_title
-#                     }
-#                 }
-#             ]
-#         },
-#         "Checkbox": {
-#             "checkbox": False
-#         }
-#     }
+    # Define the parent of the new page
+    parent = {
+        "database_id": tasks_databaseId
+    }
 
-#     # Define the parent of the new page
-#     parent = {
-#         "database_id": tasks_databaseId
-#     }
+    # Combine the new page properties and parent into a request body
+    data = {
+        "parent": parent,
+        "properties": properties
+    }
 
-#     # Combine the new page properties and parent into a request body
-#     data = {
-#         "parent": parent,
-#         "properties": properties
-#     }
+    # Send the request to create the new page
+    response = requests.post(update_PAGE_URL, headers=headers, data=json.dumps(data))
 
-#     # Send the request to create the new page
-#     response = requests.post(update_PAGE_URL, headers=headers, data=json.dumps(data))
-
-#     # Print the response content and status code
-#     print(response.status_code)
-#     if response.status_code != 200:
-#         print(f"Error creating task: {response.text}")
-#         return None
+    # Print the response content and status code
+    print(response.status_code)
+    if response.status_code != 200:
+        print(f"Error creating task: {response.text}")
+        return None
     
-#     # Get the ID of the newly created page
-#     page_id = response.json()["id"]
-#     print(f"Task '{task_title}' created successfully with ID: {page_id}")
-#     return page_id
+    # Get the ID of the newly created page
+    page_id = response.json()["id"]
+    print(f"Task '{task_title}' created successfully with ID: {page_id}")
+    return page_id
 
 # def update_page_content(page_id, markdown_content, headers):
 #     """
@@ -259,16 +221,16 @@ if __name__=="__main__":
         page_id = page_data["id"]
         check_task(page_data, page_id, headers, check_status=task_status)
     
-#     if args.uncheck_task!=None:
-#         task_num=args.uncheck_task
-#         task_status = False
-#         page_data = get_page_in_database(tasks_databaseId, headers, task_num)
-#         page_id = page_data["id"]
-#         check_task(page_data, page_id, headers, check_status=task_status)
+    if args.uncheck_task!=None:
+        task_num=args.uncheck_task
+        task_status = False
+        page_data = get_page_in_database(tasks_databaseId, headers, task_num)
+        page_id = page_data["id"]
+        check_task(page_data, page_id, headers, check_status=task_status)
     
-#     if args.add_task!=None:
-#         task_title = args.add_task
-#         create_task(task_title, tasks_databaseId, headers)
+    if args.add_task!=None:
+        task_title = args.add_task
+        create_task(task_title, tasks_databaseId, headers)
     
 #     if args.add_content != None and args.content_file != None:
 #         page_id = args.add_content

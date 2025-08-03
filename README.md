@@ -37,6 +37,10 @@ This document outlines the synchronization of local Markdown files with a Notion
 
     # To toggle the checkbox 
     python ./autonote.py --check_task=0
+    python ./autonote.py --uncheck_task=0
+
+    # To creae a new task with an blank page
+    python ./autonote.py --add_task="<PAGE-TITLE-HERE>"
 
     # To create a new task with content:
     python ./autonote.py --create_with_content "<PAGE-TITLE-HERE>" --content_file content.md
