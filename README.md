@@ -6,7 +6,7 @@ This document outlines the synchronization of local Markdown files with a Notion
 
 1. **Create a Full-Page Database (if you haven't already)** on the current page:
 
-    - For this example, set the current page title to `database-test`.
+    - In this quick start guide, set the current page title to `database-test`.
         - Instantiate a database by typing `/Database - Full page` in a blank row.
     - Name the created database `Task`.
     - Insert data entries into the database. The table schema should include the following columns:
