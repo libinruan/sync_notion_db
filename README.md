@@ -47,4 +47,7 @@ This document outlines the synchronization of local Markdown files with a Notion
 
     # To add content to an existing page (you need the page ID):
     python ./autonote.py --add_content "<PAGE-ID-HERE>" --content_file content.example.md
+
+    # To pull all pages from the database and save them into local markdown files with YAML frontmatter (supports sync state tracking)
+    python ./autonote_pull.py --pull --output_dir notion_files
     ```
