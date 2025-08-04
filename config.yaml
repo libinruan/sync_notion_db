@@ -1,0 +1,36 @@
+# Notion Sync Configuration
+
+# Default settings applied to all databases
+defaults:
+  output_dir: "notion_files"
+  file_format: "markdown"  # Options: markdown
+  frontmatter_format: "yaml"  # Options: yaml, toml, json
+  conflict_resolution: "newer_wins"  # Options: newer_wins, notion_wins, local_wins, ask
+
+# API settings
+api:
+  token: "${NOTION_TOKEN}"  # Uses environment variable by default
+  notion_version: "2022-06-28"
+
+# Database configurations
+databases:
+  - name: "task"  # A friendly name for the database
+    id: "${NOTION_TASK_DATABASE_ID}"  # Database ID (can use environment variable)
+    output_dir: "notion_files/task"  # Override default output directory
+    sync:
+      pull: true  # Whether to pull from Notion to local
+      push: true  # Whether to push from local to Notion
+      incremental: true  # Use incremental sync when possible
+    property_map:  # Map Notion properties to frontmatter fields
+      Name: "title"
+      Checkbox: "completed"
+      Status: "status"
+      Tags: "tags"
+      URL: "url"
+      Date: "due_date"
+
+# Logging settings
+logging:
+  level: "info"  # Options: debug, info, warning, error
+  file: "notion_sync.log"  # Log to file (optional)
+  console: true  # Log to console

@@ -1,8 +1,16 @@
-# Overview
+# Notion Sync Tool
 
-This document outlines the synchronization of local Markdown files with a Notion database.
+A flexible tool for synchronizing Notion databases with local markdown files.
 
-## Usage
+## Overview
+
+This tool allows you to:
+- Pull content from Notion databases to local markdown files
+- Push changes from local files back to Notion
+- Track sync state to enable efficient incremental syncing
+- Configure multiple databases with different sync settings
+
+## Setup
 
 1. **Create a Full-Page Database (if you haven't already)** on the current page:
 
@@ -30,70 +38,107 @@ This document outlines the synchronization of local Markdown files with a Notion
 
 3. **Set Your Environment Variables** for the Notion Integration API key (`NOTION_TOKEN`) and the database ID (`NOTION_TASK_DATABASE_ID`) in the `.env` file.
 
-4. **Run the CLI Tool**:
-    ```
-    # To get a list of tasks in your database
-    python ./autonote.py --get=Task
+4. **Install Required Packages**:
+   ```bash
+   pip install pyyaml python-dotenv requests
+   ```
 
-    # To toggle the checkbox 
-    python ./autonote.py --check_task=0
-    python ./autonote.py --uncheck_task=0
+## Usage
 
-    # To creae a new task with an blank page
-    python ./autonote.py --add_task="<PAGE-TITLE-HERE>"
+### Configuration-Based Approach (Recommended)
 
-    # To create a new task with content:
-    python ./autonote.py --create_with_content "<PAGE-TITLE-HERE>" --content_file content.md
+The most flexible way to use the tool is with the configuration file:
 
-    # To add content to an existing page (you need the page ID):
-    python ./autonote.py --add_content "<PAGE-ID-HERE>" --content_file content.example.md
+1. Edit the `config.yaml` file to configure your databases and sync settings.
 
-    # To pull all pages from the database and save them into local markdown files with YAML frontmatter (supports sync state tracking)
-    python ./autonote_pull.py --pull --output_dir notion_files
-    ```
+2. Use the unified CLI tool:
+   ```bash
+   # Sync (both pull and push) a specific database
+   python notion_sync.py sync task
 
-5. **Advanced Synchronization Commands**:
-    ```
-    # To pull only pages that have changed since the last sync
-    python ./incremental_sync.py --pull --output_dir notion_files
-    
-    # To check for local changes without pushing them
-    python ./incremental_sync.py --check --output_dir notion_files
-    
-    # To push local changes to Notion
-    python ./incremental_sync.py --push --output_dir notion_files
-    ```
+   # Sync all databases in the configuration
+   python notion_sync.py sync --all
 
-## Sync Features
+   # Pull only from Notion to local
+   python notion_sync.py pull task
 
-### Full Sync
-The `autonote_pull.py` script provides a full sync from Notion to local files. It:
-- Fetches all pages from your Notion database
-- Converts them to markdown files with YAML frontmatter
-- Tracks sync state in a metadata file
+   # Push only from local to Notion
+   python notion_sync.py push task
 
-### Incremental Sync
-The `incremental_sync.py` script provides more efficient syncing by:
-- Only pulling pages that have changed since the last sync
-- Detecting local changes by comparing file hashes
-- Pushing local changes back to Notion
-- Updating the sync metadata to track the state
+   # Check sync status
+   python notion_sync.py status task
 
-### Metadata Tracking
-The sync tools maintain a `.notion_sync.json` file in your output directory that tracks:
-- When the last sync occurred
-- Content hashes for each file to detect changes
-- Mappings between Notion page IDs and local files
+   # List available databases in the configuration
+   python notion_sync.py --list
+   ```
+
+### Legacy Command-Line Approach
+
+The tool also supports direct command-line usage without a configuration file:
+
+```bash
+# To get a list of tasks in your database
+python ./autonote.py --get=Task
+
+# To toggle the checkbox 
+python ./autonote.py --check_task=0
+python ./autonote.py --uncheck_task=0
+
+# To create a new task with a blank page
+python ./autonote.py --add_task="<PAGE-TITLE-HERE>"
+
+# To create a new task with content:
+python ./autonote.py --create_with_content "<PAGE-TITLE-HERE>" --content_file content.md
+
+# To add content to an existing page (you need the page ID):
+python ./autonote.py --add_content "<PAGE-ID-HERE>" --content_file content.example.md
+
+# To pull all pages from the database (full sync)
+python ./autonote_pull.py --pull --output_dir notion_files
+
+# To pull only pages that have changed since the last sync (incremental)
+python ./incremental_sync.py --pull --output_dir notion_files
+
+# To check for local changes without pushing them
+python ./incremental_sync.py --check --output_dir notion_files
+
+# To push local changes to Notion
+python ./incremental_sync.py --push --output_dir notion_files
+```
+
+## Configuration File
+
+The `config.yaml` file allows you to customize the behavior of the sync tool:
+
+```yaml
+# Database configurations
+databases:
+  - name: "task"  # A friendly name for the database
+    id: "${NOTION_TASK_DATABASE_ID}"  # Database ID (can use environment variable)
+    output_dir: "notion_files/task"  # Output directory for files
+    sync:
+      pull: true  # Whether to pull from Notion to local
+      push: true  # Whether to push from local to Notion
+      incremental: true  # Use incremental sync when possible
+    property_map:  # Map Notion properties to frontmatter fields
+      Name: "title"
+      Checkbox: "completed"
+      Status: "status"
+```
+
+See the full `config.yaml` file for more configuration options.
 
 ## File Format
+
 Local files are stored as markdown with YAML frontmatter:
+
 ```markdown
 ---
 notion_id: 1234567890abcdef1234567890abcdef
 last_edited_time: 2023-08-04T12:34:56.789Z
 title: "Example Task"
 status: "In Progress"
-checkbox: true
+completed: true
 tags: ["important", "documentation"]
 ---
 
@@ -101,3 +146,21 @@ tags: ["important", "documentation"]
 
 Your page content here...
 ```
+
+## Sync Features
+
+### Full Sync
+Fetches all pages from your Notion database and saves them as local files.
+
+### Incremental Sync
+Only syncs pages that have changed since the last sync, which is more efficient for large databases.
+
+### Two-Way Sync
+Changes can be made in either Notion or local files and then synchronized in both directions.
+
+### Metadata Tracking
+The sync tools maintain a `.notion_sync.json` file in your output directory that tracks sync state.
+
+## Development History
+
+For information about the development process and implementation phases, see [DEVELOPMENT.md](DEVELOPMENT.md).
