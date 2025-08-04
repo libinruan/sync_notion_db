@@ -84,116 +84,116 @@ def create_task(task_title, tasks_databaseId, headers):
     print(f"Task '{task_title}' created successfully with ID: {page_id}")
     return page_id
 
-# def update_page_content(page_id, markdown_content, headers):
-#     """
-#     Updates the content of a Notion page with markdown content.
+def update_page_content(page_id, markdown_content, headers):
+    """
+    Updates the content of a Notion page with markdown content.
     
-#     Args:
-#         page_id (str): The ID of the Notion page to update
-#         markdown_content (str): Markdown content to add to the page
-#         headers (dict): API headers for authentication
+    Args:
+        page_id (str): The ID of the Notion page to update
+        markdown_content (str): Markdown content to add to the page
+        headers (dict): API headers for authentication
         
-#     Returns:
-#         bool: True if successful, False otherwise
-#     """
-#     # The correct endpoint for updating content is the blocks endpoint
-#     update_blocks_url = f"https://api.notion.com/v1/blocks/{page_id}/children"
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    # The correct endpoint for updating content is the blocks endpoint
+    update_blocks_url = f"https://api.notion.com/v1/blocks/{page_id}/children"
     
-#     # Convert the markdown content to a Notion-compatible format
-#     blocks = []
-#     lines = markdown_content.strip().split('\n')
-#     i = 0
+    # Convert the markdown content to a Notion-compatible format
+    blocks = []
+    lines = markdown_content.strip().split('\n')
+    i = 0
     
-#     while i < len(lines):
-#         line = lines[i].strip()
+    while i < len(lines):
+        line = lines[i].strip()
         
-#         # Skip empty lines
-#         if not line:
-#             i += 1
-#             continue
+        # Skip empty lines
+        if not line:
+            i += 1
+            continue
         
-#         # Handle headings
-#         if line.startswith('# '):
-#             blocks.append({
-#                 "object": "block",
-#                 "type": "heading_1",
-#                 "heading_1": {
-#                     "rich_text": [{"type": "text", "text": {"content": line[2:]}}]
-#                 }
-#             })
-#         elif line.startswith('## '):
-#             blocks.append({
-#                 "object": "block",
-#                 "type": "heading_2",
-#                 "heading_2": {
-#                     "rich_text": [{"type": "text", "text": {"content": line[3:]}}]
-#                 }
-#             })
-#         elif line.startswith('### '):
-#             blocks.append({
-#                 "object": "block",
-#                 "type": "heading_3",
-#                 "heading_3": {
-#                     "rich_text": [{"type": "text", "text": {"content": line[4:]}}]
-#                 }
-#             })
-#         # Handle paragraphs (any normal text)
-#         else:
-#             blocks.append({
-#                 "object": "block",
-#                 "type": "paragraph",
-#                 "paragraph": {
-#                     "rich_text": [{"type": "text", "text": {"content": line}}]
-#                 }
-#             })
+        # Handle headings
+        if line.startswith('# '):
+            blocks.append({
+                "object": "block",
+                "type": "heading_1",
+                "heading_1": {
+                    "rich_text": [{"type": "text", "text": {"content": line[2:]}}]
+                }
+            })
+        elif line.startswith('## '):
+            blocks.append({
+                "object": "block",
+                "type": "heading_2",
+                "heading_2": {
+                    "rich_text": [{"type": "text", "text": {"content": line[3:]}}]
+                }
+            })
+        elif line.startswith('### '):
+            blocks.append({
+                "object": "block",
+                "type": "heading_3",
+                "heading_3": {
+                    "rich_text": [{"type": "text", "text": {"content": line[4:]}}]
+                }
+            })
+        # Handle paragraphs (any normal text)
+        else:
+            blocks.append({
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": [{"type": "text", "text": {"content": line}}]
+                }
+            })
         
-#         i += 1
+        i += 1
     
-#     # Create the payload with the children key
-#     payload = {
-#         "children": blocks
-#     }
+    # Create the payload with the children key
+    payload = {
+        "children": blocks
+    }
     
-#     # Make the API request
-#     response = requests.patch(update_blocks_url, headers=headers, json=payload)
+    # Make the API request
+    response = requests.patch(update_blocks_url, headers=headers, json=payload)
     
-#     # Print results
-#     print(f"Status code: {response.status_code}")
-#     if response.status_code == 200:
-#         print(f"Successfully updated page content")
-#         return True
-#     else:
-#         print(f"Failed to update page content: {response.text}")
-#         return False
+    # Print results
+    print(f"Status code: {response.status_code}")
+    if response.status_code == 200:
+        print(f"Successfully updated page content")
+        return True
+    else:
+        print(f"Failed to update page content: {response.text}")
+        return False
 
-# def create_task_with_content(task_title, markdown_content, tasks_databaseId, headers):
-#     """
-#     Creates a task in Notion and adds markdown content to its page.
+def create_task_with_content(task_title, markdown_content, tasks_databaseId, headers):
+    """
+    Creates a task in Notion and adds markdown content to its page.
     
-#     Args:
-#         task_title (str): Title of the task
-#         markdown_content (str): Markdown content for the page
-#         tasks_databaseId (str): ID of the tasks database
-#         headers (dict): API headers
+    Args:
+        task_title (str): Title of the task
+        markdown_content (str): Markdown content for the page
+        tasks_databaseId (str): ID of the tasks database
+        headers (dict): API headers
         
-#     Returns:
-#         str: ID of the created page
-#     """
-#     # First create the task
-#     page_id = create_task(task_title, tasks_databaseId, headers)
+    Returns:
+        str: ID of the created page
+    """
+    # First create the task
+    page_id = create_task(task_title, tasks_databaseId, headers)
     
-#     if page_id is None:
-#         return None
+    if page_id is None:
+        return None
     
-#     # Add content to the page
-#     if markdown_content:
-#         success = update_page_content(page_id, markdown_content, headers)
-#         if success:
-#             print(f"Content added to page successfully")
-#         else:
-#             print(f"Failed to add content to page")
+    # Add content to the page
+    if markdown_content:
+        success = update_page_content(page_id, markdown_content, headers)
+        if success:
+            print(f"Content added to page successfully")
+        else:
+            print(f"Failed to add content to page")
     
-#     return page_id
+    return page_id
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -232,14 +232,14 @@ if __name__=="__main__":
         task_title = args.add_task
         create_task(task_title, tasks_databaseId, headers)
     
-#     if args.add_content != None and args.content_file != None:
-#         page_id = args.add_content
-#         with open(args.content_file, 'r', encoding='utf-8') as f:
-#             markdown_content = f.read()
-#         update_page_content(page_id, markdown_content, headers)
+    if args.add_content != None and args.content_file != None:
+        page_id = args.add_content
+        with open(args.content_file, 'r', encoding='utf-8') as f:
+            markdown_content = f.read()
+        update_page_content(page_id, markdown_content, headers)
     
-#     if args.create_with_content != None and args.content_file != None:
-#         task_title = args.create_with_content
-#         with open(args.content_file, 'r', encoding='utf-8') as f:
-#             markdown_content = f.read()
-#         create_task_with_content(task_title, markdown_content, tasks_databaseId, headers)
+    if args.create_with_content != None and args.content_file != None:
+        task_title = args.create_with_content
+        with open(args.content_file, 'r', encoding='utf-8') as f:
+            markdown_content = f.read()
+        create_task_with_content(task_title, markdown_content, tasks_databaseId, headers)

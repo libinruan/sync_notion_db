@@ -46,5 +46,5 @@ This document outlines the synchronization of local Markdown files with a Notion
     python ./autonote.py --create_with_content "<PAGE-TITLE-HERE>" --content_file content.md
 
     # To add content to an existing page (you need the page ID):
-    python ./autonote.py --add_content "<PAGE-ID-HERE>" --content_file content.md
+    python ./autonote.py --add_content "<PAGE-ID-HERE>" --content_file content.example.md
     ```
