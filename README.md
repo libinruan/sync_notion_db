@@ -24,7 +24,7 @@ This document outlines the synchronization of local Markdown files with a Notion
     - Select the associated workspace where your database resides (e.g., "Libin's Notion").
     - Set the appropriate capabilities; at a minimum, select "Read content." Enable "Read/Write" if you want to create new pages or update existing ones.
     - Copy the token from the "Internal Integration Secret" field and click "Save."
-    - In the navigation bar, select the “Access” tab.
+    - In the navigation bar, select the "Access" tab.
     - Search for the top-level pages associated with the database (`Task`). In this case, search for the page named `database-test`.
     - Select `database-test` from the search results.
 
@@ -51,3 +51,53 @@ This document outlines the synchronization of local Markdown files with a Notion
     # To pull all pages from the database and save them into local markdown files with YAML frontmatter (supports sync state tracking)
     python ./autonote_pull.py --pull --output_dir notion_files
     ```
+
+5. **Advanced Synchronization Commands**:
+    ```
+    # To pull only pages that have changed since the last sync
+    python ./incremental_sync.py --pull --output_dir notion_files
+    
+    # To check for local changes without pushing them
+    python ./incremental_sync.py --check --output_dir notion_files
+    
+    # To push local changes to Notion
+    python ./incremental_sync.py --push --output_dir notion_files
+    ```
+
+## Sync Features
+
+### Full Sync
+The `autonote_pull.py` script provides a full sync from Notion to local files. It:
+- Fetches all pages from your Notion database
+- Converts them to markdown files with YAML frontmatter
+- Tracks sync state in a metadata file
+
+### Incremental Sync
+The `incremental_sync.py` script provides more efficient syncing by:
+- Only pulling pages that have changed since the last sync
+- Detecting local changes by comparing file hashes
+- Pushing local changes back to Notion
+- Updating the sync metadata to track the state
+
+### Metadata Tracking
+The sync tools maintain a `.notion_sync.json` file in your output directory that tracks:
+- When the last sync occurred
+- Content hashes for each file to detect changes
+- Mappings between Notion page IDs and local files
+
+## File Format
+Local files are stored as markdown with YAML frontmatter:
+```markdown
+---
+notion_id: 1234567890abcdef1234567890abcdef
+last_edited_time: 2023-08-04T12:34:56.789Z
+title: "Example Task"
+status: "In Progress"
+checkbox: true
+tags: ["important", "documentation"]
+---
+
+# Content Title
+
+Your page content here...
+```
