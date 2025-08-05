@@ -10,7 +10,33 @@ This tool allows you to:
 - Track sync state to enable efficient incremental syncing
 - Configure multiple databases with different sync settings
 
-## Setup
+## Quick-Start Tutorial
+
+1. Clone the Sync App:
+
+   - Use `git` to clone the sync app into a folder parallel to your project folder.
+   - For example, if your project folder is named 'Doggy', create another folder called 'Doggy_db'.
+   - Navigate into the 'Doggy_db' folder and run the command `git clone <YOUR-REPO> .`, ensuring you include the trailing period.
+
+2. Create a Full-Page Database in Notion.
+
+3. Create an Integration for the Full-Page Database:
+
+   - Visit Notion Integrations.
+   - Assign a name to your integration (this is up to your preference and is not critical).
+   - Obtain the full-page database ID, which can be found in the middle part of the sharing URL of the full-page database. You can access this by clicking the Share button located at the upper right corner of the Notion interface.
+   - Go to the Access tab, search for your full-page database, and select it.
+
+4. Edit config.yaml:
+
+   - Update the name field with the full-page database name.
+   - Update the id field with the full-page database ID.
+   - Update the output_dir field to specify the folder that will host your page (block) instances.
+
+5. Run Data Synchronization (from a Python virtual environment):
+   - Execute the command: `python notion_sync.py sync --all`.
+
+## Setup in Details
 
 1. **Create a Full-Page Database (if you haven't already)** on the current page:
 
